@@ -86,10 +86,10 @@ thread-based implementation one can see that it sends 1 message to the global
 'MeetingPlace' which then performs all the logic under one single global lock, 
 then directly accessing *public* variables (that I think should be private) in 
 the different Chameneos. For each of these single messages the idiomatic Actor 
-implemenation sends 3 messages and lets each Chameneos actor update its state 
-internally. Both of the Actor implemenations (Akka and Scala Actors) are fairly 
+implementation sends 3 messages and lets each Chameneos actor update its state 
+internally. Both of the Actor implementations (Akka and Scala Actors) are fairly 
 clean conceptually and allows for refactoring, extensibility and reuse, something 
-that can't be said for the Java thread implemenation. But I think it is fair to 
+that can't be said for the Java thread implementation. But I think it is fair to 
 say that Akka (with its ExecutorBasedEventDrivenDispatcher) is still performing 
 surprisingly well.
 
