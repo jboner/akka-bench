@@ -21,7 +21,7 @@ object Chameneos {
   var end: Long = 0L
   
   class Chameneo(var mall: Mall, var colour: Colour, cid:Int) extends Actor {
-     dispatcher = Dispatchers.newThreadBasedDispatcher(this)
+     //dispatcher = Dispatchers.newThreadBasedDispatcher(this)
      var meetings = 0
      start
      mall ! Meet(this, colour)
@@ -70,13 +70,13 @@ object Chameneos {
    }
 
   class Mall(var n: Int, numChameneos: Int) extends Actor {
-    dispatcher = Dispatchers.newThreadBasedDispatcher(this)
+    //dispatcher = Dispatchers.newThreadBasedDispatcher(this)
     var waitingChameneo:Option[Actor] = None
     var sumMeetings = 0
     var numFaded = 0
 
     start
-    for (i <- numChameneos) new Chameneo(this, colours(i % 3), i)
+    for (i <- 0 until numChameneos) new Chameneo(this, colours(i % 3), i)
     
     def receive = {
       case MeetingCount(i) =>
@@ -88,6 +88,7 @@ object Chameneos {
         }
           
       case msg @ Meet(a, c) =>
+      println("--------- MEET")
         if (n > 0) {
           waitingChameneo match {
             case Some(chameneo) =>
@@ -114,7 +115,7 @@ object Chameneos {
   def main(args : Array[String]) : Unit = {
     System.setProperty("akka.config", "akka.conf")
     Chameneos.start = System.currentTimeMillis
-    new Mall(1000000, 4)
+    new Mall(10000, 4)
     Thread.sleep(30000)
     println("Elapsed: " + (end - start))
   }
