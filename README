@@ -1,12 +1,24 @@
+==============================
+===Two different benchmarks===
+==============================
+
+The project currently consists of different benchmarks. These two benchmarks 
+stresses the actors very differently, which can be seen in the results in that 
+which kind of execution strategies (schedulers/dispatchers) varies a lot between 
+benchmarks.
+
 ==================================
 ===Build and Run the benchmarks===
 ==================================
 
 All the six modules in the two benchmarks are build with SBT. 
-Step into each module and invoke: 
+
+Step into each module and invoke:
+$ sbt update 
 $ sbt run
 
-This should build and run the benchmark and print out the results to the console.
+This should download dependencies, build and run the benchmark and print out 
+the results to the console.
 
 ================================
 ===Download service benchmark===
@@ -24,9 +36,13 @@ Description:
 It originates from this article (which compares some more Java actor frameworks): 
 http://sujitpal.blogspot.com/2009/01/more-java-actor-frameworks-compared.html
 
-This benchmark consists of three stages 'Download -> Index -> Write' and tries to emulate a pipeline service.
+This benchmark consists of three stages 'Download -> Index -> Write' and tries 
+to emulate a pipeline service.
 
-Jetlang was chosen as Java implementation since it is widely known as the fastest and most scalable Java Actors library. It might be a matter of taste but I find both of the Actor implementations significantly more straightforward, clear and easy to understand.
+Jetlang was chosen as Java implementation since it is widely known as the fastest 
+and most scalable Java Actors library. It might be a matter of taste but I find 
+both of the Actor implementations significantly more straightforward, clear and 
+easy to understand.
 
 --------------
 Result doing 1 million requests:
@@ -64,7 +80,18 @@ Description:
 
 This benchmark originates from http://shootout.alioth.debian.org/.
 
-It is not really fair to compare an idiomatic Actor-based implementation with the most brutal bare-bones thread-based implementation. If one looks at the Java thread-based implementation one can see that it sends 1 message to the global 'MeetingPlace' which then performs all the logic under one single global lock, then directly accessing state that should be private to the different Chameneos. For each of these single messages the idiomatic Actor implemenation sends 3 messages and lets each Chameneos actor update its state internally. Both of the Actor implemenations (Akka and Scala Actors) are fairly clean conceptually and allows for refactoring, extensibility and reuse, something that can't be said for the Java thread implemenation. But I think it is fair to say that Akka (with its ExecutorBasedEventDrivenDispatcher) is still performing surprisingly well.
+It is not really fair to compare an idiomatic Actor-based implementation with 
+the most brutal bare-bones thread-based implementation. If one looks at the Java 
+thread-based implementation one can see that it sends 1 message to the global 
+'MeetingPlace' which then performs all the logic under one single global lock, 
+then directly accessing *public* variables (that I think should be private) in 
+the different Chameneos. For each of these single messages the idiomatic Actor 
+implementation sends 3 messages and lets each Chameneos actor update its state 
+internally. Both of the Actor implementations (Akka and Scala Actors) are fairly 
+clean conceptually and allows for refactoring, extensibility and reuse, something 
+that can't be said for the Java thread implementation. But I think it is fair to 
+say that Akka (with its ExecutorBasedEventDrivenDispatcher) is still performing 
+surprisingly well.
 
 --------------
 Result doing 1 million messages:
