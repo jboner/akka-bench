@@ -88,7 +88,6 @@ object Chameneos {
         }
           
       case msg @ Meet(a, c) =>
-      println("--------- MEET")
         if (n > 0) {
           waitingChameneo match {
             case Some(chameneo) =>
@@ -115,7 +114,7 @@ object Chameneos {
   def main(args : Array[String]) : Unit = {
     System.setProperty("akka.config", "akka.conf")
     Chameneos.start = System.currentTimeMillis
-    new Mall(10000, 4)
+    new Mall(1000000, 4)
     Thread.sleep(30000)
     println("Elapsed: " + (end - start))
   }
