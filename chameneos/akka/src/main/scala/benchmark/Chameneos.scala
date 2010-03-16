@@ -115,7 +115,7 @@ object Chameneos {
     System.setProperty("akka.config", "akka.conf")
     Chameneos.start = System.currentTimeMillis
     new Mall(1000000, 4)
-    Thread.sleep(30000)
+    Thread.sleep(10000)
     println("Elapsed: " + (end - start))
   }
 }

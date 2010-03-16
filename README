@@ -54,7 +54,7 @@ Akka with ThreadBasedDispatcher:
 ~8.5 seconds
 
 Akka with ExecutorBasedEventDrivenDispatcher:
-~20 seconds
+~11 seconds
 
 Akka with ReactorBasedSingleThreadEventDrivenDispatcher:
 ~9 seconds
