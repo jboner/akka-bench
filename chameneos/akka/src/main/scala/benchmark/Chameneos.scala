@@ -109,7 +109,7 @@ object Chameneos {
   case object BLUE extends Colour
   case object FADED extends Colour
   
-  val colours = Array(BLUE, RED, YELLOW)
+  val colours = Array[Colour](BLUE, RED, YELLOW)
   
   def main(args : Array[String]) : Unit = {
     System.setProperty("akka.config", "akka.conf")

@@ -4,7 +4,7 @@
 package benchmark.akka.stm;
 
 import se.scalablesolutions.akka.actor.{Transactor, Actor}
-import se.scalablesolutions.akka.stm.Transaction.atomic
+import se.scalablesolutions.akka.stm.Transaction.Local.atomic
 import se.scalablesolutions.akka.stm.TransactionalRef
 
 case object Start
@@ -119,7 +119,7 @@ object ChameneosSTM {
 
       println("\nStart: \t" + System.currentTimeMillis)
       implicit val txName = "ChameneosSTM"
-      creatures.foreach(_ send Start)
+      creatures.foreach(_ ! Start)
 
       Thread.sleep(1000 * 20)
       creatures.foreach(_.stop)

@@ -4,7 +4,11 @@
 package benchmark.akka.actor;
 
 import se.scalablesolutions.akka.actor.Actor
-import se.scalablesolutions.akka.dispatch.{CompletableFuture, DefaultCompletableFuture}
+import se.scalablesolutions.akka.dispatch.{Dispatchers, CompletableFuture, DefaultCompletableFuture}
+
+object Dispatcher {
+  val pooled = Dispatchers.newExecutorBasedEventDrivenWorkStealingDispatcher("pooled-dispatcher")
+}
 
 object Colours extends Enumeration {
    val Blue = Value("blue")
@@ -19,12 +23,13 @@ case class Meet(id: Int, c: Colour)
 case class Pair(sameId: Boolean, colour: Colour)
 
 class Creature(place: MeetingPlace, var colour: Colour) extends Actor {
+  dispatcher = Dispatcher.pooled
   import ChameneosActor._
    val identity = System.identityHashCode(this)
    var sameCount = 0
    var count = 0
    start 
-   place send "hello"
+   place ! "hello"
    
    def receive = {
      case Start => 
@@ -47,6 +52,7 @@ class Creature(place: MeetingPlace, var colour: Colour) extends Actor {
 }
 
 class MeetingPlace(private var meetingsLeft: Int) extends Actor {
+  dispatcher = Dispatcher.pooled
    import ChameneosActor._
    private var firstColour: Option[Colour] = None
    private var firstId = 0
@@ -107,7 +113,7 @@ object ChameneosActor {
       val creatures = colours.map(new Creature(place, _)).toArray
 
       println("Start: \t" + System.currentTimeMillis)
-      creatures.foreach(_ send Start)
+      creatures.foreach(_ ! Start)
 
       Thread.sleep(60000)
       creatures.foreach(_.stop)

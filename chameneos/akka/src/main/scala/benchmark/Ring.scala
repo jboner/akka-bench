@@ -7,8 +7,8 @@ import se.scalablesolutions.akka.util.Logging
 object Ring extends Logging {
   def main(args: Array[String]): Unit = {
     System.setProperty("akka.config", "akka.conf")
-    //startRing(args(0).toInt) send StartMessage
-    startRing(10) send StartMessage
+    //startRing(args(0).toInt) ! StartMessage
+    startRing(10) !! StartMessage
   }
 
   def startRing(n: Int): NodeActor = {

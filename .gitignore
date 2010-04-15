@@ -1,14 +1,7 @@
-chameneos/akka/project/boot/
-chameneos/java/project/boot/
-chameneos/scala-actors/project/boot/
-download/akka/project/boot/
-download/jetlang/project/boot/
-download/scala-actors/project/boot/
 *~
 *#
-project/boot/*
 */project/build/target
-*/project/bootgit 
+*/*/project/boot/
 lib_managed
 etags
 TAGS
