@@ -3,26 +3,30 @@
    contributed by Julien Gaugaz
    inspired by the version contributed by Yura Taras and modified by Isaac Gouy
 */
-package benchmark.akka.actor;
+package benchmark.akka.actor
 
 import se.scalablesolutions.akka.actor.Actor
-import se.scalablesolutions.akka.dispatch.Dispatchers
-
-case class Exit(actor: Actor, reason: String)
 
 object Chameneos {
-  val pooled = Dispatchers.newExecutorBasedEventDrivenWorkStealingDispatcher("pooled-dispatcher")
   
-  // messages
-  case class Meet(from: Actor, colour:Colour)
-  case class Change(colour: Colour)
-  case class MeetingCount(count:Int)
+  sealed trait ChameneosEvent
+  case class Meet(from: Actor, colour: Colour) extends ChameneosEvent
+  case class Change(colour: Colour) extends ChameneosEvent
+  case class MeetingCount(count: Int) extends ChameneosEvent
+  case object Exit extends ChameneosEvent
   
-  var start: Long = 0L
-  var end: Long = 0L
+  abstract class Colour
+  case object RED extends Colour
+  case object YELLOW extends Colour
+  case object BLUE extends Colour
+  case object FADED extends Colour
   
-  class Chameneo(var mall: Mall, var colour: Colour, cid:Int) extends Actor {
-     dispatcher = pooled
+  val colours = Array[Colour](BLUE, RED, YELLOW)
+  
+  var start = 0L
+  var end = 0L
+  
+  class Chameneo(var mall: Mall, var colour: Colour, cid: Int) extends Actor {
      var meetings = 0
      start
      mall ! Meet(this, colour)
@@ -39,7 +43,7 @@ object Chameneos {
          meetings = meetings +1
          mall ! Meet(this,colour)	
 
-       case Exit(_,_) =>
+       case Exit =>
          colour = FADED
          sender.get ! MeetingCount(meetings)
          stop
@@ -67,7 +71,7 @@ object Chameneos {
        case FADED => FADED
      }
 
-     override def toString() = cid+"("+colour+")"
+     override def toString = cid + "(" + colour + ")"
    }
 
   class Mall(var n: Int, numChameneos: Int) extends Actor {
@@ -97,27 +101,17 @@ object Chameneos {
             case None => waitingChameneo = sender
           }
         } else {
-          waitingChameneo.foreach(_ ! Exit(this, "normal"))
-          sender.get ! Exit(this, "normal")
+          waitingChameneo.foreach(_ ! Exit)
+          sender.get ! Exit
         }
     }
   }
   
-  abstract class Colour
-  case object RED extends Colour
-  case object YELLOW extends Colour
-  case object BLUE extends Colour
-  case object FADED extends Colour
-  
-  val colours = Array[Colour](BLUE, RED, YELLOW)
-  
-  def main(args : Array[String]) : Unit = {
+  def main(args : Array[String]): Unit = {
     System.setProperty("akka.config", "akka.conf")
     Chameneos.start = System.currentTimeMillis
     new Mall(1000000, 4)
     Thread.sleep(10000)
-    println("Start: " + start)
-    println("End: " + end)
     println("Elapsed: " + (end - start))
   }
 }
