@@ -1,8 +1,8 @@
-==============================
-===Two different benchmarks===
-==============================
+================================
+===Three different benchmarks===
+================================
 
-The project currently consists of different benchmarks. These two benchmarks 
+The project currently consists of different benchmarks. These three benchmarks 
 stresses the actors very differently, which can be seen in the results in that 
 which kind of execution strategies (schedulers/dispatchers) varies a lot between 
 benchmarks.
@@ -110,3 +110,22 @@ Scala Actors with 'react':
 
 Scala Actors with 'receive': 
 ~ 21 seconds
+
+==========================
+===Token Ring benchmark===
+==========================
+
+--------------
+Benchmark between:
+* Akka 0.8.1 (Scala 2.8.0.Beta1)
+* Scala Actors (Scala 2.8.0.Beta1)
+
+--------------
+Description:
+
+Sends a token around a ring of 10 actors one million times.
+
+--------------
+Result:
+
+TODO
