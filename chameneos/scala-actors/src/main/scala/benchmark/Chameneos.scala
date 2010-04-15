@@ -82,18 +82,18 @@ object Chameneos {
     var meetings = 0
     def act() {
       loop {
-        mall!Meet(colour)	
+        mall ! Meet(colour)	
         react {
           case Meet(otherColour) =>
             colour = complement(otherColour)
             meetings = meetings +1
-            sender!Change(colour)
+            sender ! Change(colour)
           case Change(newColour) =>
             colour = newColour
             meetings = meetings +1
           case Exit(_,_) =>
 	    colour = FADED
-            sender!MeetingCount(meetings)
+            sender ! MeetingCount(meetings)
             exit()
         }
       }
@@ -132,7 +132,7 @@ object Chameneos {
       numChameneos = Integer.parseInt(args(1))
     Chameneos.start = System.currentTimeMillis
     new Mall(N, numChameneos)
-    Thread.sleep(60000)
+    Thread.sleep(30000)
     println("Elapsed: " + (end - start))
   }
 }

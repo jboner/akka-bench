@@ -11,6 +11,7 @@ import se.scalablesolutions.akka.dispatch.Dispatchers
 case class Exit(actor: Actor, reason: String)
 
 object Chameneos {
+  val pooled = Dispatchers.newExecutorBasedEventDrivenWorkStealingDispatcher("pooled-dispatcher")
   
   // messages
   case class Meet(from: Actor, colour:Colour)
@@ -21,7 +22,7 @@ object Chameneos {
   var end: Long = 0L
   
   class Chameneo(var mall: Mall, var colour: Colour, cid:Int) extends Actor {
-     //dispatcher = Dispatchers.newThreadBasedDispatcher(this)
+     dispatcher = pooled
      var meetings = 0
      start
      mall ! Meet(this, colour)
@@ -70,8 +71,7 @@ object Chameneos {
    }
 
   class Mall(var n: Int, numChameneos: Int) extends Actor {
-    //dispatcher = Dispatchers.newThreadBasedDispatcher(this)
-    var waitingChameneo:Option[Actor] = None
+    var waitingChameneo: Option[Actor] = None
     var sumMeetings = 0
     var numFaded = 0
 
@@ -116,6 +116,8 @@ object Chameneos {
     Chameneos.start = System.currentTimeMillis
     new Mall(1000000, 4)
     Thread.sleep(10000)
+    println("Start: " + start)
+    println("End: " + end)
     println("Elapsed: " + (end - start))
   }
 }

@@ -20,14 +20,14 @@ $ sbt run
 This should download dependencies, build and run the benchmark and print out 
 the results to the console.
 
-================================
-===Download service benchmark===
-================================
+========================
+===Pipeline benchmark===
+========================
 
 --------------
 Benchmark between:
-* Akka (Scala 2.7.7)
-* Scala Actors (Scala 2.7.7)
+* Akka 0.8.1 (Scala 2.8.0.Beta1)
+* Scala Actors (Scala 2.8.0.Beta1)
 * Jetlang (Java)
 
 --------------
@@ -71,8 +71,8 @@ Scala Actors with 'receive':
 
 --------------
 Benchmark between:
-* Akka (Scala 2.7.7)
-* Scala Actors (Scala 2.7.7)
+* Akka 0.8.1 (Scala 2.8.0.Beta1)
+* Scala Actors (Scala 2.8.0.Beta1)
 * Thread/synchronized (Java)
 
 --------------
