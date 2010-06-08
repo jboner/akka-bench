@@ -12,7 +12,7 @@ class AkkaBench(info: ProjectInfo) extends DefaultProject(info) {
   val m2 = "m2" at "http://download.java.net/maven/2"
 
   // deps
-  val akka_core = "se.scalablesolutions.akka" % "akka-core_2.8.0.RC3" % "0.9" % "compile"
+  val akka_core = "se.scalablesolutions.akka" % "akka-core_2.8.0.RC3" % "0.10" % "compile"
 
   override def mainClass = Some("benchmark.akka.ActorManager")
 }
