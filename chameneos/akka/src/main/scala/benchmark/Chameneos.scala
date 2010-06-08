@@ -5,12 +5,13 @@
 */
 package benchmark.akka.actor
 
-import se.scalablesolutions.akka.actor.Actor
+import se.scalablesolutions.akka.actor.{Actor, ActorRef}
+import se.scalablesolutions.akka.actor.Actor._
 
 object Chameneos {
   
   sealed trait ChameneosEvent
-  case class Meet(from: Actor, colour: Colour) extends ChameneosEvent
+  case class Meet(from: ActorRef, colour: Colour) extends ChameneosEvent
   case class Change(colour: Colour) extends ChameneosEvent
   case class MeetingCount(count: Int) extends ChameneosEvent
   case object Exit extends ChameneosEvent
@@ -26,27 +27,26 @@ object Chameneos {
   var start = 0L
   var end = 0L
   
-  class Chameneo(var mall: Mall, var colour: Colour, cid: Int) extends Actor {
+  class Chameneo(var mall: ActorRef, var colour: Colour, cid: Int) extends Actor {
      var meetings = 0
-     start
-     mall ! Meet(this, colour)
+     self.start
+     mall ! Meet(self, colour)
 
      def receive = {
        case Meet(from, otherColour) =>
          colour = complement(otherColour)
          meetings = meetings +1
          from ! Change(colour)
-         mall ! Meet(this,colour)	
+         mall ! Meet(self, colour)	
 
        case Change(newColour) =>
          colour = newColour
          meetings = meetings +1
-         mall ! Meet(this,colour)	
+         mall ! Meet(self, colour)	
 
        case Exit =>
          colour = FADED
-         sender.get ! MeetingCount(meetings)
-         stop
+         self.sender.get ! MeetingCount(meetings)
      }
 
      def complement(otherColour: Colour): Colour = colour match {
@@ -75,12 +75,13 @@ object Chameneos {
    }
 
   class Mall(var n: Int, numChameneos: Int) extends Actor {
-    var waitingChameneo: Option[Actor] = None
+    var waitingChameneo: Option[ActorRef] = None
     var sumMeetings = 0
     var numFaded = 0
-
-    start
-    for (i <- 0 until numChameneos) new Chameneo(this, colours(i % 3), i)
+    
+    override def init = {
+      for (i <- 0 until numChameneos) actorOf(new Chameneo(self, colours(i % 3), i))
+    }
     
     def receive = {
       case MeetingCount(i) =>
@@ -88,7 +89,7 @@ object Chameneos {
         sumMeetings += i
         if (numFaded == numChameneos) {
           Chameneos.end = System.currentTimeMillis
-          stop
+          self.stop
         }
           
       case msg @ Meet(a, c) =>
@@ -98,11 +99,11 @@ object Chameneos {
               n -= 1
               chameneo ! msg 
               waitingChameneo = None
-            case None => waitingChameneo = sender
+            case None => waitingChameneo = self.sender
           }
         } else {
           waitingChameneo.foreach(_ ! Exit)
-          sender.get ! Exit
+          self.sender.get ! Exit
         }
     }
   }
@@ -110,7 +111,7 @@ object Chameneos {
   def main(args : Array[String]): Unit = {
     System.setProperty("akka.config", "akka.conf")
     Chameneos.start = System.currentTimeMillis
-    new Mall(1000000, 4)
+    actorOf(new Mall(1000000, 4)).start
     Thread.sleep(10000)
     println("Elapsed: " + (end - start))
   }

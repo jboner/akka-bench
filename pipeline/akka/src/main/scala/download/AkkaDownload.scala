@@ -3,7 +3,8 @@ package benchmark.akka
 import java.lang._
 import java.util.concurrent.CountDownLatch
 
-import se.scalablesolutions.akka.actor.Actor
+import se.scalablesolutions.akka.actor.{Actor, ActorRef}
+import se.scalablesolutions.akka.actor.Actor._
 import se.scalablesolutions.akka.dispatch.Dispatchers
 
 case object StopMessage
@@ -14,56 +15,50 @@ object ActorManager {
   def decrementLatch = latch.countDown
 
   def main(args: Array[String]) {
-    import Actor.Sender.Self 
     System.setProperty("akka.config", "akka.conf")
 
-    DownloadActor.start
-    IndexActor.start
-    WriteActor.start
+    val write = actorOf[WriteActor].start
+    val index = actorOf(new IndexActor(write)).start
+    val download = actorOf(new DownloadActor(index)).start
 
     val start = System.currentTimeMillis
-    for (i <- 1 until NR_REQUESTS) {
-      val payload = "Requested " + i
-      DownloadActor ! payload
-    }
-    DownloadActor ! StopMessage
+    for (i <- 1 until NR_REQUESTS) download ! ("Requested " + i)
+    download ! StopMessage
     latch.await
-    DownloadActor.stop
-    IndexActor.stop
-    WriteActor.stop
+    download.stop
+    index.stop
+    write.stop
     println("Elapsed = " + (System.currentTimeMillis - start))
   }
 }
 
 
-object DownloadActor extends Actor {
-  dispatcher = Dispatchers.newThreadBasedDispatcher(this)
+class DownloadActor(index: ActorRef) extends Actor {
+  self.dispatcher = Dispatchers.newThreadBasedDispatcher(self)
   def receive = {
     case payload: String =>
-      val newPayload = payload.replaceFirst("Requested ", "Downloaded ")
-      IndexActor ! newPayload
+      index ! payload.replaceFirst("Requested ", "Downloaded ")
 
     case StopMessage =>
-      IndexActor ! StopMessage
+      index ! StopMessage
       ActorManager.decrementLatch
   }
 }
 
-object IndexActor extends Actor {
-  dispatcher = Dispatchers.newThreadBasedDispatcher(this)
+class IndexActor(write: ActorRef) extends Actor {
+  self.dispatcher = Dispatchers.newThreadBasedDispatcher(self)
   def receive = {
     case payload: String =>
-      val newPayload = payload.replaceFirst("Downloaded ", "Indexed ")
-      WriteActor ! newPayload
+      write ! payload.replaceFirst("Downloaded ", "Indexed ")
 
     case StopMessage => 
-      WriteActor ! StopMessage
+      write ! StopMessage
       ActorManager.decrementLatch
   }
 }
 
-object WriteActor extends Actor {
-  dispatcher = Dispatchers.newThreadBasedDispatcher(this)
+class WriteActor extends Actor {
+  self.dispatcher = Dispatchers.newThreadBasedDispatcher(self)
   def receive = {
     case payload: String =>
       payload.replaceFirst("Indexed ", "Wrote ")
